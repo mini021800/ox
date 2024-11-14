@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>청소년 마음건강 퀴즈</title>
+    <style>
+        /* 전체 화면 중앙 정렬 */
+        body, html {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f8ff;
+        }
+        
+        /* 퀴즈 상자 스타일 */
+        .quiz-container {
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            background-color: #ffffff;
+            padding: 30px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 25px;
+        }
+        
+        #question {
+            font-size: 24px;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        /* 버튼 스타일 */
+        button {
+            font-size: 20px;
+            padding: 12px 24px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #ddd;
+        }
+
+        /* O와 X 버튼 색상 */
+        button.answer-button {
+            width: 100px;
+        }
+        .answer-true {
+            background-color: #4CAF50; /* O 버튼: 초록색 */
+            color: white;
+        }
+        .answer-false {
+            background-color: #f44336; /* X 버튼: 빨간색 */
+            color: white;
+        }
+
+        /* 결과 메시지 스타일 */
+        #result {
+            font-size: 22px;
+            margin-top: 15px;
+        }
+
+        /* 숨김 클래스 */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>청소년 마음건강 OX 퀴즈</h1>
+        <div id="question"></div>
+        <button id="trueButton" class="answer-button answer-true" onclick="checkAnswer(true)">O</button>
+        <button id="falseButton" class="answer-button answer-false" onclick="checkAnswer(false)">X</button>
+        <div id="result"></div>
+        <button id="nextButton" class="hidden" onclick="nextQuestion()">다음 문제</button>
+        <button id="restartButton" class="hidden" onclick="restartQuiz()">다시 시작하기</button>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                question: "스트레스를 받을 때, 친구나 가족에게 이야기하는 것이 좋다.", 
+                answer: true, 
+                explanation: "가족이나 친구에게 이야기하면 스트레스 해소에 도움이 됩니다." 
+            },
+            { 
+                question: "가끔 우울하거나 기분이 안좋다고 해서 꼭 문제가 있는 것은 아니다.", 
+                answer: true, 
+                explanation: "누구나 기분이 좋지 않을 때가 있습니다. 중요한 것은 이러한 감정을 다루는 방법입니다." 
+            },
+            { 
+                question: "학교나 집에서의 작은 갈등은 무시해도 괜찮다.", 
+                answer: false, 
+                explanation: "작은 갈등도 방치하면 커질 수 있으니 대화를 통해 해결하는 것이 좋습니다." 
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let attemptCount = 0;
+
+        function showQuestion() {
+            const questionElement = document.getElementById("question");
+            const resultElement = document.getElementById("result");
+            const nextButton = document.getElementById("nextButton");
+            const restartButton = document.getElementById("restartButton");
+            const trueButton = document.getElementById("trueButton");
+            const falseButton = document.getElementById("falseButton");
+
+            questionElement.textContent = questions[currentQuestionIndex].question;
+            resultElement.textContent = "";
+            nextButton.classList.add("hidden");
+            restartButton.classList.add("hidden");
+            trueButton.classList.remove("hidden");
+            falseButton.classList.remove("hidden");
+            attemptCount = 0; // Reset attempt count for the new question
+        }
+
+        function checkAnswer(selectedAnswer) {
+            const correctAnswer = questions[currentQuestionIndex].answer;
+            const questionElement = document.getElementById("question");
+            const resultElement = document.getElementById("result");
+            const nextButton = document.getElementById("nextButton");
+
+            if (selectedAnswer === correctAnswer) {
+                questionElement.textContent = ""; // 문제 텍스트 지우기
+                resultElement.textContent = "정답입니다! " + questions[currentQuestionIndex].explanation;
+                resultElement.style.color = "green";
+                nextButton.classList.remove("hidden"); // '다음 문제' 버튼 보이기
+                hideAnswerButtons(); // 정답 맞췄을 때 선택 버튼 숨기기
+            } else {
+                attemptCount++;
+                if (attemptCount < 2) {
+                    resultElement.textContent = "틀렸습니다! 다시 한번 생각해보세요!";
+                    resultElement.style.color = "orange";
+                } else {
+                    resultElement.textContent = "틀렸습니다! 정답은 " + (correctAnswer ? "O" : "X") + "입니다.";
+                    resultElement.style.color = "red";
+                    nextButton.classList.remove("hidden"); // '다음 문제' 버튼 보이기
+                    hideAnswerButtons(); // 선택 버튼 숨기기
+                }
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                const questionElement = document.getElementById("question");
+                const resultElement = document.getElementById("result");
+                questionElement.textContent = "퀴즈가 종료되었습니다!";
+                resultElement.textContent = "";
+                hideAnswerButtons(); // 종료 시 선택 버튼 숨기기
+                document.getElementById("nextButton").classList.add("hidden");
+                document.getElementById("restartButton").classList.remove("hidden");
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            showQuestion();
+        }
+
+        function hideAnswerButtons() {
+            document.getElementById("trueButton").classList.add("hidden");
+            document.getElementById("falseButton").classList.add("hidden");
+        }
+
+        showQuestion();
+    </script>
+</body>
+</html>
